@@ -1,0 +1,11 @@
+# install packages
+apk update && apk upgrade
+apk add bash nano iptables curl htop
+
+# setup nano as default editor
+touch /etc/profile.d/editor.sh
+echo "export EDITOR=/usr/bin/nano" > /etc/profile.d/editor.sh
+
+# change login shell from /bin/ash to /bin/bash
+sed -i 's/\/bin\/ash/\bin\/bash/g' /etc/passwd
+
