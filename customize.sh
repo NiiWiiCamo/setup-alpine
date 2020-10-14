@@ -19,8 +19,8 @@ mkdir -p /etc/startup
 
 mkdir -p /etc/skel/.ssh
 
-# setup root cron
-cat <<EOF | crontab
+# setup user cron
+cat <<EOF > /etc/skel/usercron
 # do daily/weekly/monthly maintenance
 # min	hour	day	month	weekday	command
 */15	*	*	*	*	run-parts ~/.cronjobs/periodic/15min
@@ -33,6 +33,24 @@ cat <<EOF | crontab
 
 # custom cronjobs:
 EOF
+
+# setup root cron
+cat <<EOF > rootcron
+# do daily/weekly/monthly maintenance
+# min	hour	day	month	weekday	command
+*/15	*	*	*	*	run-parts /etc/periodic/15min
+0	*	*	*	*	run-parts /etc/periodic/hourly
+0	*/6	*	*	*	run-parts /etc/periodic/4aday
+0	2	*	*	*	run-parts /etc/periodic/daily
+0	3	*	*	6	run-parts /etc/periodic/weekly
+0	5	1	*	*	run-parts /etc/periodic/monthly
+@reboot					run-parts /etc/startup
+
+# custom cronjobs:
+EOF
+
+crontab rootcron
+rm rootcron
 
 # ask for username
 echo "Enter name for sudo user: "
@@ -50,7 +68,7 @@ echo "Enter ssh update script link: "
 read sshlink
 
 # execute as new user
-su $newuser -c "curl -sSL ${sshlink} | tee ~/.cronjobs/periodic/4aday/get-ssh-keys | bash"
+su $newuser -c "curl -sSL ${sshlink} | tee ~/.cronjobs/periodic/4aday/get-ssh-keys | bash; crontab usercron"
 
 # setup sshd_config
 sed -i 's/\#PermitRootLogin prohibit-password/PermitRootLogin no/g' /etc/ssh/sshd_config
