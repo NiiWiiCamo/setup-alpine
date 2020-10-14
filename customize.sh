@@ -2,7 +2,7 @@
 
 # add programs
 apk update && apk upgrade
-apk add bash curl iptables ip6tables htop nano
+apk add bash curl iptables ip6tables htop nano sudo
 
 # change default shell for root
 sed -i 's/\/bin\/ash/\/bin\/bash/g' /etc/passwd
@@ -52,23 +52,16 @@ EOF
 crontab rootcron
 rm rootcron
 
-# ask for username
-echo "Enter name for sudo user: "
-read newuser
-
 # add user
-adduser -s /bin/bash $newuser
-adduser $newuser wheel
+adduser -s /bin/bash nilsblume
+adduser nilsblume wheel
 
 # add wheel group to sudoers
 echo '%wheel ALL=(ALL) ALL' > /etc/sudoers.d/wheel
 
-# ask for ssh script
-echo "Enter ssh update script link: "
-read sshlink
 
 # execute as new user
-su $newuser -c "curl -sSL ${sshlink} | tee ~/.cronjobs/periodic/4aday/get-ssh-keys | bash; crontab usercron"
+su nilsblume -c "curl -sSL https://raw.githubusercontent.com/NiiWiiCamo/ssh/master/get-keys.bash | tee ~/.cronjobs/periodic/4aday/get-ssh-keys | bash; crontab usercron"
 
 # setup sshd_config
 sed -i 's/\#PermitRootLogin prohibit-password/PermitRootLogin no/g' /etc/ssh/sshd_config
