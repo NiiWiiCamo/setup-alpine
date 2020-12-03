@@ -68,3 +68,33 @@ sed -i 's/\#PermitRootLogin prohibit-password/PermitRootLogin no/g' /etc/ssh/ssh
 sed -i 's/\#PubkeyAuthentication yes/PubkeyAuthentication yes/g' /etc/ssh/sshd_config
 sed -i 's/\#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
 sed -i 's/\#PermitEmptyPasswords no/PermitEmptyPasswords no/g' /etc/ssh/sshd_config
+
+# setup iptables
+cat <<EOF > /etc/startup/00_iptables
+iptables-restore /etc/iptables/rules-save
+ip6tables-restore /etc/iptables/rules6-save
+EOF
+
+cat <<EOF > /etc/iptables/rules-save
+# iptables base config
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+[0:0] -A INPUT -i lo -j ACCEPT
+[0:0] -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+[0:0] -A INPUT -p tcp --dport 22 -j ACCEPT
+COMMIT
+EOF
+
+cat <<EOF > /etc/iptables/rules6-save
+# iptables base config
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+[0:0] -A INPUT -i lo -j ACCEPT
+[0:0] -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+[0:0] -A INPUT -p tcp --dport 22 -j ACCEPT
+COMMIT
+EOF
