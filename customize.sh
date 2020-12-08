@@ -71,11 +71,12 @@ sed -i 's/\#PermitEmptyPasswords no/PermitEmptyPasswords no/g' /etc/ssh/sshd_con
 
 # setup iptables
 cat <<EOF > /etc/startup/00_iptables
+#!/bin/bash
 iptables-restore /etc/iptables/rules-save
 ip6tables-restore /etc/iptables/rules6-save
 EOF
 
-cat <<EOF > /etc/iptables/rules-save
+cat <<EOF > /etc/iptables/rules-base
 # iptables base config
 *filter
 :INPUT DROP [0:0]
@@ -87,14 +88,5 @@ cat <<EOF > /etc/iptables/rules-save
 COMMIT
 EOF
 
-cat <<EOF > /etc/iptables/rules6-save
-# iptables base config
-*filter
-:INPUT DROP [0:0]
-:FORWARD DROP [0:0]
-:OUTPUT ACCEPT [0:0]
-[0:0] -A INPUT -i lo -j ACCEPT
-[0:0] -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
-[0:0] -A INPUT -p tcp --dport 22 -j ACCEPT
-COMMIT
-EOF
+cp /etc/iptables/rules-base /etc/iptables/rules-save
+cp /etc/iptables/rules-base /etc/iptables/rules6-save
