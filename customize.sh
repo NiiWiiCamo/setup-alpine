@@ -61,7 +61,7 @@ echo '%wheel ALL=(ALL) ALL' > /etc/sudoers.d/wheel
 
 
 # execute as new user
-su nilsblume -c "cd ~; curl -sSL https://raw.githubusercontent.com/NiiWiiCamo/ssh/master/get-keys.bash | tee ~/.cronjobs/periodic/4aday/get-ssh-keys | bash; crontab ~/usercron"
+su nilsblume -c "cd ~; curl -sSL https://raw.githubusercontent.com/NiiWiiCamo/ssh/master/get-keys.bash | tee ~/.cronjobs/periodic/4aday/get-ssh-keys | bash; chmod +x ~/.cronjobs/periodic/4aday/*; crontab ~/usercron"
 
 # setup sshd_config
 sed -i 's/\#PermitRootLogin prohibit-password/PermitRootLogin no/g' /etc/ssh/sshd_config
@@ -75,6 +75,7 @@ cat <<EOF > /etc/startup/00_iptables
 iptables-restore /etc/iptables/rules-save
 ip6tables-restore /etc/iptables/rules6-save
 EOF
+chmod +x /etc/startup/*
 
 cat <<EOF > /etc/iptables/rules-base
 # iptables base config
