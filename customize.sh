@@ -1,17 +1,17 @@
 #!/bin/ash
 
-# username to be created
+## username to be created
 echo "Enter name for normal user with sudo:"
 read newuser
 
-# add programs
+## add programs
 apk update && apk upgrade
 apk add bash curl iptables ip6tables htop nano sudo screen
 
-# change default shell for root
+## change default shell for root
 sed -i 's/\/bin\/ash/\/bin\/bash/g' /etc/passwd
 
-# setup skel and cron folders
+## setup skel and cron folders
 mkdir -p /etc/skel/
 mkdir -p /etc/skel/.cronjobs/periodic/15min
 mkdir -p /etc/skel/.cronjobs/periodic/hourly
@@ -21,11 +21,19 @@ mkdir -p /etc/skel/.cronjobs/periodic/monthly
 mkdir -p /etc/skel/.cronjobs/startup
 mkdir -p /etc/startup
 
+## add screen autoconnect
 cat <<EOF > /etc/skel/.bash_profile
 # test if you are not in screen session, then reattaches first available or creates new session
 if [ -z "$STY" ]; then screen -RR; fi
 EOF
 
+## set motd
+echo "Welcome to $(hostname)!" > /etc/motd
+
+## set motd to display on entering bash (also works in screen)
+echo "cat /etc/motd" > /etc/skel/.bashrc
+
+## create .ssh folder for skel
 mkdir -p /etc/skel/.ssh
 
 # setup user cron
@@ -43,7 +51,7 @@ cat <<EOF > /etc/skel/usercron
 # custom cronjobs:
 EOF
 
-# setup root cron
+## setup root cron
 cat <<EOF > rootcron
 # do daily/weekly/monthly maintenance
 # min	hour	day	month	weekday	command
@@ -61,24 +69,24 @@ EOF
 crontab rootcron
 rm rootcron
 
-# add user
+## add user
 adduser -s /bin/bash $newuser
 adduser $newuser wheel
 
-# add wheel group to sudoers
+## add wheel group to sudoers
 echo '%wheel ALL=(ALL) ALL' > /etc/sudoers.d/wheel
 
 
-# execute as new user
+## execute as new user
 su $newuser -c "cd ~; curl -sSL https://raw.githubusercontent.com/NiiWiiCamo/ssh/master/get-keys.bash | tee ~/.cronjobs/periodic/4aday/get-ssh-keys | bash; chmod +x ~/.cronjobs/periodic/4aday/*; crontab ~/usercron; rm ~/usercron"
 
-# setup sshd_config
+## setup sshd_config
 sed -i 's/\#PermitRootLogin prohibit-password/PermitRootLogin no/g' /etc/ssh/sshd_config
 sed -i 's/\#PubkeyAuthentication yes/PubkeyAuthentication yes/g' /etc/ssh/sshd_config
 sed -i 's/\#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
 sed -i 's/\#PermitEmptyPasswords no/PermitEmptyPasswords no/g' /etc/ssh/sshd_config
 
-# setup iptables
+## setup iptables
 cat <<EOF > /etc/startup/00_iptables
 #!/bin/bash
 iptables-restore /etc/iptables/rules-save
