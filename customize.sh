@@ -6,7 +6,7 @@ read newuser
 
 # add programs
 apk update && apk upgrade
-apk add bash curl iptables ip6tables htop nano sudo
+apk add bash curl iptables ip6tables htop nano sudo screen
 
 # change default shell for root
 sed -i 's/\/bin\/ash/\/bin\/bash/g' /etc/passwd
@@ -20,6 +20,11 @@ mkdir -p /etc/skel/.cronjobs/periodic/daily
 mkdir -p /etc/skel/.cronjobs/periodic/monthly
 mkdir -p /etc/skel/.cronjobs/startup
 mkdir -p /etc/startup
+
+cat <<EOF > /etc/skel/.bash_profile
+# test if you are not in screen session, then reattaches first available or creates new session
+if [ -z "$STY" ]; then screen -RR; fi
+EOF
 
 mkdir -p /etc/skel/.ssh
 
@@ -65,7 +70,7 @@ echo '%wheel ALL=(ALL) ALL' > /etc/sudoers.d/wheel
 
 
 # execute as new user
-su $newuser -c "cd ~; curl -sSL https://raw.githubusercontent.com/NiiWiiCamo/ssh/master/get-keys.bash | tee ~/.cronjobs/periodic/4aday/get-ssh-keys | bash; chmod +x ~/.cronjobs/periodic/4aday/*; crontab ~/usercron"
+su $newuser -c "cd ~; curl -sSL https://raw.githubusercontent.com/NiiWiiCamo/ssh/master/get-keys.bash | tee ~/.cronjobs/periodic/4aday/get-ssh-keys | bash; chmod +x ~/.cronjobs/periodic/4aday/*; crontab ~/usercron; rm ~/usercron"
 
 # setup sshd_config
 sed -i 's/\#PermitRootLogin prohibit-password/PermitRootLogin no/g' /etc/ssh/sshd_config
