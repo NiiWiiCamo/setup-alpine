@@ -1,5 +1,9 @@
 #!/bin/ash
 
+# username to be created
+echo "Enter name for normal user with sudo:"
+read newuser
+
 # add programs
 apk update && apk upgrade
 apk add bash curl iptables ip6tables htop nano sudo
@@ -53,15 +57,15 @@ crontab rootcron
 rm rootcron
 
 # add user
-adduser -s /bin/bash nilsblume
-adduser nilsblume wheel
+adduser -s /bin/bash $newuser
+adduser $newuser wheel
 
 # add wheel group to sudoers
 echo '%wheel ALL=(ALL) ALL' > /etc/sudoers.d/wheel
 
 
 # execute as new user
-su nilsblume -c "cd ~; curl -sSL https://raw.githubusercontent.com/NiiWiiCamo/ssh/master/get-keys.bash | tee ~/.cronjobs/periodic/4aday/get-ssh-keys | bash; chmod +x ~/.cronjobs/periodic/4aday/*; crontab ~/usercron"
+su $newuser -c "cd ~; curl -sSL https://raw.githubusercontent.com/NiiWiiCamo/ssh/master/get-keys.bash | tee ~/.cronjobs/periodic/4aday/get-ssh-keys | bash; chmod +x ~/.cronjobs/periodic/4aday/*; crontab ~/usercron"
 
 # setup sshd_config
 sed -i 's/\#PermitRootLogin prohibit-password/PermitRootLogin no/g' /etc/ssh/sshd_config
