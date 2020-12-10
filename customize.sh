@@ -6,7 +6,7 @@ read newuser
 
 ## add programs
 apk update && apk upgrade
-apk add bash curl iptables ip6tables htop nano sudo screen
+apk add bash curl iptables ip6tables htop nano screen sudo vlan
 
 ## change default shell for root
 sed -i 's/\/bin\/ash/\/bin\/bash/g' /etc/passwd
