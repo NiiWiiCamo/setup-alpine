@@ -61,7 +61,7 @@ echo '%wheel ALL=(ALL) ALL' > /etc/sudoers.d/wheel
 
 
 # execute as new user
-su nilsblume -c "curl -sSL https://raw.githubusercontent.com/NiiWiiCamo/ssh/master/get-keys.bash | tee ~/.cronjobs/periodic/4aday/get-ssh-keys | bash; crontab usercron"
+su nilsblume -c "cd ~; curl -sSL https://raw.githubusercontent.com/NiiWiiCamo/ssh/master/get-keys.bash | tee ~/.cronjobs/periodic/4aday/get-ssh-keys | bash; crontab ~/usercron"
 
 # setup sshd_config
 sed -i 's/\#PermitRootLogin prohibit-password/PermitRootLogin no/g' /etc/ssh/sshd_config
