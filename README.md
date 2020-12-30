@@ -4,4 +4,4 @@ This script sets up alpine ready for use. This setup is mainly for my own use, a
 
 1. install alpine and do setup-alpine (openssh)
 2. reboot
-3. wget -O https://raw.githubusercontent.com/NiiWiiCamo/setup-alpine/main/customize.sh && ash customize.sh
+3. wget -O customize.sh https://raw.githubusercontent.com/NiiWiiCamo/setup-alpine/main/customize.sh && ash customize.sh
