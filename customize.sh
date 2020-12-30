@@ -4,9 +4,12 @@
 echo "Enter name for normal user with sudo:"
 read newuser
 
+## activate community repo
+sed -i '/^#.*\/v.*\/community/s/^#//' /etc/apk/repositories
+
 ## add programs
 apk update && apk upgrade
-apk add bash curl iptables ip6tables htop nano screen sudo vlan
+apk add bash curl iptables ip6tables htop nano open-vm-tools screen sudo vlan
 
 ## change default shell for root
 sed -i 's/\/bin\/ash/\/bin\/bash/g' /etc/passwd
